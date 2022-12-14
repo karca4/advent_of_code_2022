@@ -1,44 +1,83 @@
+import re
+
+
 def part1():
-    print("In how many assignment pairs does one range fully contain the other?")
-    contained = 0
+    print("After the rearrangement procedure completes, what crate ends up on top of each stack?")
+    crates = dict()
 
-    with open("./res/day4.txt", "r") as f:
+    with open("./res/day5.txt", "r") as f:
         for line in f.readlines():
-            item1: set
-            item2: set
-            item1, item2 = line.strip().split(',')
-            item1 = set(
-                [i for i in range(int(item1.split("-")[0]), int(item1.split("-")[1]) + 1)])
-            item2 = set(
-                [i for i in range(int(item2.split("-")[0]), int(item2.split("-")[1]) + 1)])
+            crates_re = re.compile(
+                r'(.{3})\s{1}')
+            crates_match = crates_re.findall(line)
 
-            if item1.issubset(item2) or item2.issubset(item1):
-                contained += 1
+            for idx, i in enumerate(crates_match, start=1):
+                if idx not in crates:
+                    crates[idx] = list()
+                if i != '   ':
+                    crates[idx].insert(0, i)
 
-    print(contained)
+            command_re = re.compile(
+                r'^move ([0-9]*) from ([0-9]*) to ([0-9]*)\n')
+            command_match = command_re.match(line)
+
+            if command_match:
+                crates_to_move = command_match.group(1)
+                crates_from = command_match.group(2)
+                crates_to = command_match.group(3)
+
+                for i in range(int(crates_to_move)):
+                    crate = crates[int(crates_from)].pop()
+                    crates[int(crates_to)].append(crate)
+
+        result = ""
+        for c in crates.values():
+            if c:
+                result += c[-1]
+
+        print(result.replace("[", "").replace("]", ""))
 
 
 def part2():
-    print("In how many assignment pairs do the ranges overlap?")
-    overlap = 0
+    print("After the rearrangement procedure completes, what crate ends up on top of each stack?")
+    crates = dict()
 
-    with open("./res/day4.txt", "r") as f:
+    with open("./res/day5.txt", "r") as f:
         for line in f.readlines():
-            item1: set
-            item2: set
-            item1, item2 = line.strip().split(',')
-            item1 = set(
-                [i for i in range(int(item1.split("-")[0]), int(item1.split("-")[1]) + 1)])
-            item2 = set(
-                [i for i in range(int(item2.split("-")[0]), int(item2.split("-")[1]) + 1)])
+            crates_re = re.compile(
+                r'(.{3})\s{1}')
+            crates_match = crates_re.findall(line)
 
-            if item1.intersection(item2):
-                overlap += 1
+            for idx, i in enumerate(crates_match, start=1):
+                if idx not in crates:
+                    crates[idx] = list()
+                if i != '   ':
+                    crates[idx].insert(0, i)
 
-    print(overlap)
+            command_re = re.compile(
+                r'^move ([0-9]*) from ([0-9]*) to ([0-9]*)\n')
+            command_match = command_re.match(line)
+
+            if command_match:
+                crates_to_move = command_match.group(1)
+                crates_from = command_match.group(2)
+                crates_to = command_match.group(3)
+
+                crates_list = list()
+                for i in range(int(crates_to_move)):
+                    crates_list.insert(0, crates[int(crates_from)].pop())
+
+                crates[int(crates_to)].extend(crates_list)
+
+        result = ""
+        for c in crates.values():
+            if c:
+                result += c[-1]
+
+        print(result.replace("[", "").replace("]", ""))
 
 
 if __name__ == "__main__":
-    print("https://adventofcode.com/2022/day/4")
+    print("https://adventofcode.com/2022/day/5")
     part1()
     part2()
